@@ -42,7 +42,7 @@ export default {
 				// enable run-time checks when not in production
 				dev: !production,
 				// Tell the compiler to output a custom element.
-				customElement: true, //this breaks the web page/app
+				//==customElement: true, //this breaks the web page/app
 
 			}
 		}),
