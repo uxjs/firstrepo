@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width,initial-scale=1'>
+
+	<title>Svelte app</title>
+
+	<link rel='icon' type='image/png' href='/favicon.png'>
+	<link rel='stylesheet' href='/global.css'>
+	<link rel='stylesheet' href='/build/bundle.css'>
+
+	<script defer src='/build/bundle.js'></script>
+
+	<style>
+		body {
+		  padding: 0;
+		  margin: 0;
+		}
+  
+		.open-button {
+		  border: 0;
+		  position: absolute;
+		  top: 50%;
+		  left: 50%;
+		  transform: translate(-50%, -50%);
+		  background: lightgreen;
+		  color: white;
+		  padding: 10px 20px;
+		  border-radius: 10px;
+		  font-size: 21px;
+		}
+  
+		/* - TimePicker below - */
+  
+		.save-button {
+		  margin: auto;
+		  text-align: center;
+		  width: 100%;
+		  border: 3px solid navy;
+		  padding: 7px;
+		}
+		.circle-me {
+		  position: relative;
+		  width: 60px;
+		  line-height: 60px;
+		  border-radius: 50%;
+		  text-align: center;
+		  font-size: 32px;
+		  /*   border: 3px solid #fff; */
+		  background: black;
+		  color: #fff;
+		  z-index: 9999;
+		}
+  
+		.digital-container {
+		  position: relative;
+		  width: 350px;
+		  height: 50px;
+		  text-align: center;
+		  font-family: 'Roboto', sans-serif;
+		  font-size: 50px;
+		  font-weight: bold;
+		  padding-bottom: 5px;
+		  /* border: 1px solid black; */
+		  background-color: #c24448;
+		}
+		body {
+		  font-family: 'Roboto';
+		  font-size: 0.9 rem;
+		}
+  
+		.watch-container {
+		  position: relative;
+		  width: 350px;
+		  height: 430px;
+		  /*   border: 1px solid black; */
+		}
+		.watch {
+		  position: absolute;
+		  width: 90%;
+		  height: 72%;
+		  border: 1px solid rgb(195, 209, 219);
+		  background-color: rgb(240, 242, 242);
+		  border-radius: 50%;
+		  left: 2%;
+		  top: 10%;
+		}
+		.inner-watch {
+		  position: relative;
+		  width: 70%;
+		  height: 70%;
+		  border-radius: 50%;
+		  background: rgb(195, 209, 219);
+		  border: 1px solid rgb(210, 210, 210);
+		  left: 15%;
+		  top: 15%;
+		}
+		.numbers {
+		  position: absolute;
+		  display: block;
+		  height: 6%;
+		  width: 90%;
+		  top: 44%;
+		  left: 0%;
+		  padding: 12px 16px;
+		  z-index: 1;
+		}
+  
+		/* -- popup below -- */
+  
+		.modal-backdrop {
+		  position: fixed;
+		  top: 0;
+		  left: 0;
+		  width: 100%;
+		  height: 100vh;
+		  background: rgba(0, 0, 0, 0.75);
+		  z-index: 10;
+		}
+  
+		.modal {
+		  position: fixed;
+		  top: 10vh;
+		  left: 10%;
+		  width: 80%;
+		  max-height: 80vh;
+		  background: white;
+		  border-radius: 5px;
+		  z-index: 100;
+		  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+		  overflow: scroll;
+		}
+  
+		h1 {
+		  padding: 1rem;
+		  margin: 0;
+		  border-bottom: 1px solid #ccc;
+		  font-family: 'Roboto Slab', sans-serif;
+		}
+  
+		.content {
+		  padding: 1rem;
+		}
+  
+		footer {
+		  padding: 1rem;
+		}
+  
+		@media (min-width: 768px) {
+		  .modal {
+			width: 40rem;
+			left: calc(50% - 20rem);
+		  }
+		}
+	  </style>
+	  <title>Modal</title>
+</head>
+
+<body>
+
+	<button class="open-button">Open modal</button>
+
+    <modal-element width="800px" height="600px">
+      <div>
+        <!-- start of TimePicker -->
+
+        <!-- hour headder -->
+        <div class="digital-container">
+          <span
+            on:click="{hour24panel}"
+            bind:this="{hourdisplay}"
+            id="show-24-hour"
+            >12</span
+          >
+          <!-- minutes headder -->
+          <span style="color: #c79395">:</span>
+          <span
+            on:click="{minutepanel}"
+            bind:this="{minutedisplay}"
+            id="show-minutes"
+            >27</span
+          >
+        </div>
+
+        <div class="watch-container">
+          <button class="save-button">Save</button>
+
+          <div class="watch">
+            <card bind:this="{hour12card}" id="hour12-card">
+              <div class="numbers">
+                <span
+                  on:click="{hour_9}"
+                  style="float: left"
+                  class="{selected_09h}"
+                  id="9h"
+                  >9</span
+                ><span
+                  on:click="{hour_3}"
+                  style="float: right"
+                  class="{selected_03h}"
+                  id="3h"
+                  >3</span
+                >
+              </div>
+
+              <div class="numbers" style="-webkit-transform: rotateZ(30deg)">
+                <span
+                  on:click="{hour_10}"
+                  style="float: left; -webkit-transform: rotateZ(-30deg)"
+                  class="{selected_10h}"
+                  id="10h"
+                  >10</span
+                ><span
+                  on:click="{hour_4}"
+                  style="float: right; -webkit-transform: rotateZ(-30deg)"
+                  class="{selected_04h}"
+                  id="4h"
+                  >4</span
+                >
+              </div>
+
+              <div class="numbers" style="-webkit-transform: rotateZ(60deg)">
+                <span
+                  on:click="{hour_11}"
+                  style="float: left; -webkit-transform: rotateZ(-60deg)"
+                  class="{selected_11h}"
+                  id="11h"
+                  >11</span
+                ><span
+                  on:click="{hour_5}"
+                  style="float: right; -webkit-transform: rotateZ(-60deg)"
+                  class="{selected_05h}"
+                  id="5h"
+                  >5</span
+                >
+              </div>
+
+              <div class="numbers" style="-webkit-transform: rotateZ(90deg)">
+                <span
+                  on:click="{hour_12}"
+                  style="float: left; -webkit-transform: rotateZ(-90deg)"
+                  class="{selected_12h}"
+                  id="12h"
+                  >12</span
+                ><span
+                  on:click="{hour_6}"
+                  style="float: right; -webkit-transform: rotateZ(-90deg)"
+                  class="{selected_06h}"
+                  id="6h"
+                  >6</span
+                >
+              </div>
+
+              <div class="numbers" style="-webkit-transform: rotateZ(120deg)">
+                <span
+                  on:click="{hour_1}"
+                  style="float: left; -webkit-transform: rotateZ(-120deg)"
+                  class="{selected_01h}"
+                  id="1h"
+                  >1</span
+                ><span
+                  on:click="{hour_7}"
+                  style="float: right; -webkit-transform: rotateZ(-120deg)"
+                  class="{selected_07h}"
+                  id="7h"
+                  >7</span
+                >
+              </div>
+
+              <div class="numbers" style="-webkit-transform: rotateZ(150deg)">
+                <span
+                  on:click="{hour_2}"
+                  style="float: left; -webkit-transform: rotateZ(-150deg)"
+                  class="{selected_02h}"
+                  id="2h"
+                  >2</span
+                ><span
+                  on:click="{hour_8}"
+                  style="float: right; -webkit-transform: rotateZ(-150deg)"
+                  class="{selected_08h}"
+                  id="8h"
+                  >8</span
+                >
+              </div>
+            </card>
+
+            <div class="inner-watch">
+              <card bind:this="{hour24card}" id="hour24-card">
+                <div class="numbers">
+                  <span
+                    on:click="{hour_21}"
+                    style="float: left"
+                    class="{selected_21h}"
+                    id="21h"
+                    >21</span
+                  ><span
+                    on:click="{hour_15}"
+                    style="float: right"
+                    class="{selected_15h}"
+                    id="15h"
+                    >15</span
+                  >
+                </div>
+
+                <div class="numbers" style="-webkit-transform: rotateZ(30deg)">
+                  <span
+                    on:click="{hour_22}"
+                    style="float: left; -webkit-transform: rotateZ(-30deg)"
+                    class="{selected_22h}"
+                    id="22h"
+                    >22</span
+                  ><span
+                    on:click="{hour_16}"
+                    style="float: right; -webkit-transform: rotateZ(-30deg)"
+                    class="{selected_16h}"
+                    id="16h"
+                    >16</span
+                  >
+                </div>
+
+                <div class="numbers" style="-webkit-transform: rotateZ(60deg)">
+                  <span
+                    on:click="{hour_23}"
+                    style="float: left; -webkit-transform: rotateZ(-60deg)"
+                    class="{selected_23h}"
+                    id="23h"
+                    >23</span
+                  ><span
+                    on:click="{hour_17}"
+                    style="float: right; -webkit-transform: rotateZ(-60deg)"
+                    class="{selected_17h}"
+                    id="17h"
+                    >17</span
+                  >
+                </div>
+
+                <div class="numbers" style="-webkit-transform: rotateZ(90deg)">
+                  <span
+                    on:click="{hour_00}"
+                    style="float: left; -webkit-transform: rotateZ(-90deg)"
+                    class="{selected_00h}"
+                    id="00h"
+                    >00</span
+                  ><span
+                    on:click="{hour_18}"
+                    style="float: right; -webkit-transform: rotateZ(-90deg)"
+                    class="{selected_18h}"
+                    id="18h"
+                    >18</span
+                  >
+                </div>
+
+                <div class="numbers" style="-webkit-transform: rotateZ(120deg)">
+                  <span
+                    on:click="{hour_13}"
+                    style="float: left; -webkit-transform: rotateZ(-120deg)"
+                    class="{selected_13h}"
+                    id="13h"
+                    >13</span
+                  ><span
+                    on:click="{hour_19}"
+                    style="float: right; -webkit-transform: rotateZ(-120deg)"
+                    class="{selected_19h}"
+                    id="19h"
+                    >19</span
+                  >
+                </div>
+
+                <div class="numbers" style="-webkit-transform: rotateZ(150deg)">
+                  <span
+                    on:click="{hour_14}"
+                    style="float: left; -webkit-transform: rotateZ(-150deg)"
+                    class="{selected_14h}"
+                    id="14h"
+                    >14</span
+                  ><span
+                    on:click="{hour_20}"
+                    style="float: right; -webkit-transform: rotateZ(-150deg)"
+                    class="{selected_20h}"
+                    id="20h"
+                    >20</span
+                  >
+                </div>
+              </card>
+            </div>
+
+            <card bind:this="{minutecard}" id="minute-card">
+              <div class="numbers">
+                <span
+                  on:click="{minute_45}"
+                  style="float: left"
+                  class="{selected_45m}"
+                  id="45m"
+                  >45
+                </span>
+                <span
+                  on:click="{minute_15}"
+                  style="float: right"
+                  class="{selected_15m}"
+                  id="15m"
+                  >15
+                </span>
+              </div>
+
+              <div class="numbers" style="-webkit-transform: rotateZ(30deg)">
+                <span
+                  on:click="{minute_50}"
+                  style="float: left; -webkit-transform: rotateZ(-30deg)"
+                  class="{selected_50m}"
+                  id="50m"
+                  >50</span
+                ><span
+                  on:click="{minute_20}"
+                  style="float: right; -webkit-transform: rotateZ(-30deg)"
+                  class="{selected_20m}"
+                  id="20m"
+                  >20</span
+                >
+              </div>
+
+              <div class="numbers" style="-webkit-transform: rotateZ(60deg)">
+                <span
+                  on:click="{minute_55}"
+                  style="float: left; -webkit-transform: rotateZ(-60deg)"
+                  class="{selected_55m}"
+                  id="55m"
+                  >55</span
+                ><span
+                  on:click="{minute_25}"
+                  style="float: right; -webkit-transform: rotateZ(-60deg)"
+                  class="{selected_25m}"
+                  id="25m"
+                  >25</span
+                >
+              </div>
+
+              <div class="numbers" style="-webkit-transform: rotateZ(90deg)">
+                <span
+                  on:click="{minute_00}"
+                  style="float: left; -webkit-transform: rotateZ(-90deg)"
+                  class="{selected_00m}"
+                  id="00m"
+                  >00</span
+                ><span
+                  on:click="{minute_30}"
+                  style="float: right; -webkit-transform: rotateZ(-90deg)"
+                  class="{selected_30m}"
+                  id="30m"
+                  >30</span
+                >
+              </div>
+
+              <div class="numbers" style="-webkit-transform: rotateZ(120deg)">
+                <span
+                  on:click="{minute_05}"
+                  style="float: left; -webkit-transform: rotateZ(-120deg)"
+                  class="{selected_05m}"
+                  id="5m"
+                  >5</span
+                ><span
+                  on:click="{minute_35}"
+                  style="float: right; -webkit-transform: rotateZ(-120deg)"
+                  class="{selected_35m}"
+                  id="35m"
+                  >35</span
+                >
+              </div>
+
+              <div class="numbers" style="-webkit-transform: rotateZ(150deg)">
+                <span
+                  on:click="{minute_10}"
+                  style="float: left; -webkit-transform: rotateZ(-150deg)"
+                  class="{selected_10m}"
+                  id="10m"
+                  >10
+                </span>
+                <span
+                  on:click="{minute_40}"
+                  style="float: right; -webkit-transform: rotateZ(-150deg)"
+                  class="{selected_40m}"
+                  id="40m"
+                  >40
+                </span>
+              </div>
+            </card>
+          </div>
+        </div>
+
+        <!-- end TimePicker -->
+      </div>
+    </modal-element>
+</body>
+</html>
