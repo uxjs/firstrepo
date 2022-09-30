@@ -1,0 +1,12 @@
+
+# First Repo
+
+## I hope to create something great
+
+
+1. buy a new bike for Kent
+2. Pearl necklace for my wife
+3. Learn how to write
+
+
+
